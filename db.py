@@ -1,5 +1,7 @@
 import sqlite3
 
+# This stays in the local folder. 
+# It's free, but it's temporary on Render!
 conn = sqlite3.connect("bot.db", check_same_thread=False)
 cursor = conn.cursor()
 
@@ -17,5 +19,4 @@ CREATE TABLE IF NOT EXISTS users (
     last_message INTEGER DEFAULT 0
 )
 """)
-
 conn.commit()

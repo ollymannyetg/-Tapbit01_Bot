@@ -431,9 +431,7 @@ app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_ne
 app.add_handler(CommandHandler("setuid", setuid))
 app.add_handler(CommandHandler("settwitter", settwitter))
 
+import asyncio
 
-
-
-
-
-app.run_polling() 
+if __name__ == "__main__":
+    asyncio.run(app.run_polling())
