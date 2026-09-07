@@ -517,7 +517,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
         except Exception as e:
-            print(f"Stock price error: {e}")
+            print("STOCK ERROR:", repr(e))
             await update.message.reply_text(
                 f"❌ Couldn't get {coin} stock data right now."
             )
