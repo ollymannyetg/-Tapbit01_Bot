@@ -539,13 +539,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             icon = "🟢" if change >= 0 else "🔴"
 
             await update.message.reply_text(
-                f"🏢 <b>{stock_symbols[coin]} ({coin})</b>\n\n"
-                f"💵 <b>Price:</b> ${price:,.2f}\n"
-                f"{icon} <b>Change:</b> {change:+,.2f} ({change_percent})\n\n"
-                f"📈 <i>US Stock Market</i>",
-                parse_mode="HTML"
+                (
+                    f"💰 <b>{coin}/USDT</b>\n\n"
+                    f"💵 <b>Price:</b> {price_display}\n"
+                    f"📈 <b>24H High:</b> {high_display}\n"
+                    f"📉 <b>24H Low:</b> {low_display}\n"
+                    f"📊 <b>24H Volume:</b> ${volume_24h:,.0f}\n"
+                    f"{change_icon} <b>24H Change:</b> {change_24h:+.2f}%\n\n"
+                    f"⚡ <i>Market data powered by Tapbit</i>"
+                ),
+                parse_mode="HTML",
+                reply_markup=reply_markup
             )
-
         except Exception as e:
             print("STOCK ERROR:", repr(e))
             await update.message.reply_text(
