@@ -461,7 +461,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"📊 <b>24H Volume:</b> ${volume_24h:,.0f}\n"
                 f"{change_icon} <b>24H Change:</b> {change_24h:+.2f}%\n\n"
                 f"⚡ <i>Market data powered by Tapbit</i>",
-                parse_mode="HTML"
+                parse_mode="HTML",
                 reply_markup=reply_markup
             )
 
