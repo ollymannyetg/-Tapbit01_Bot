@@ -1,5 +1,5 @@
 from telegram.ext import ChatMemberHandler
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes
 from db import conn, cursor
 import time
@@ -437,6 +437,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             high_display = format_price(high_24h)
             low_display = format_price(low_24h)
 
+            keyboard = [
+                [
+                    InlineKeyboardButton(
+                        f"🚀 Trade {coin} on Tapbit",
+                        url="https://www.tapbit.com"
+                    )
+                ]
+            ]
+
+            reply_markup = InlineKeyboardMarkup(keyboard)
+
             if change_24h >= 0:
                 change_icon = "🟢"
             else:
@@ -451,6 +462,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"{change_icon} <b>24H Change:</b> {change_24h:+.2f}%\n\n"
                 f"⚡ <i>Market data powered by Tapbit</i>",
                 parse_mode="HTML"
+                reply_markup=reply_markup
             )
 
         except Exception as e:
