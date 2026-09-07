@@ -504,7 +504,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             price = float(quote["05. price"])
             change = float(quote["09. change"])
             change_percent = quote["10. change percent"]
-
+s
             icon = "🟢" if change >= 0 else "🔴"
 
             await update.message.reply_text(
