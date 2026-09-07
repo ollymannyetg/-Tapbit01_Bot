@@ -6,6 +6,10 @@ import time
 from telegram.ext import MessageHandler, filters
 
 import os
+import re
+import requests
+from telegram.constants import ChatMemberStatus
+
 TOKEN = os.getenv("BOT_TOKEN")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -53,42 +57,102 @@ async def points(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def addpoint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin_id = 7356560699
 
+    # ✅ Only admin allowed
     if update.effective_user.id != admin_id:
-        await update.message.reply_text("❌ You are not allowed")
+        await update.message.reply_text("❌ Not allowed")
         return
 
     try:
+        # ✅ Check arguments
+        if len(context.args) < 2:
+            await update.message.reply_text("Usage: /addpoint @username 50")
+            return
+
         username = context.args[0].replace("@", "")
         amount = int(context.args[1])
 
-        cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+        # ✅ Get current points
+        cursor.execute("SELECT points FROM users WHERE username=?", (username,))
         user = cursor.fetchone()
 
         if not user:
-            await update.message.reply_text("❌ User not found. Ask them to /start first")
+            await update.message.reply_text("❌ User not found. Ask them to /start")
             return
 
+        old_points = user[0]
+
+        # ✅ Update points
         cursor.execute(
-            "UPDATE users SET points = points + ? WHERE username = ?",
+            "UPDATE users SET points = points + ? WHERE username=?",
             (amount, username)
         )
         conn.commit()
 
-        await update.message.reply_text(f"✅ Added {amount} points to @{username}")
+        new_points = old_points + amount
 
-    except:
-        await update.message.reply_text("Usage: /addpoint @username 10")
+        # ✅ CLEAR RESPONSE
+        await update.message.reply_text(
+            f"✅ @{username}\n\n"
+            f"Old Points: {old_points}\n"
+            f"Added: +{amount}\n"
+            f"New Points: {new_points}"
+        )
+
+    except Exception as e:
+        await update.message.reply_text(f"❌ Error: {e}")
 async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    cursor.execute("SELECT username, points FROM users ORDER BY points DESC LIMIT 15")
-    users = cursor.fetchall()
+    try:
+        # 🔒 Admin IDs (won’t appear)
+        admin_ids = (7356560699,)  # add more if needed
 
-    message = "🏆 Leaderboard\n\n"
+        # 🧠 Handle query safely
+        if admin_ids:
+            placeholders = ",".join(["?"] * len(admin_ids))
+            query = f"""
+                SELECT username, points
+                FROM users
+                WHERE user_id NOT IN ({placeholders})
+                ORDER BY points DESC
+                LIMIT 15
+            """
+            cursor.execute(query, admin_ids)
+        else:
+            cursor.execute("""
+                SELECT username, points
+                FROM users
+                ORDER BY points DESC
+                LIMIT 15
+            """)
 
-    for i, user in enumerate(users, 1):
-        name = user[0] if user[0] else "unknown"
-        message += f"{i}. @{name} - {user[1]} pts\n"
+        users = cursor.fetchall()
 
-    await update.message.reply_text(message)
+        # 🧾 Build message (NO Markdown = NO ERRORS)
+        message = "🏆 Leaderboard\n\n"
+
+        if not users:
+            message += "No users yet."
+        else:
+            for i, user in enumerate(users, 1):
+                name = user[0] if user[0] else "unknown"
+                points = user[1]
+
+                # 🥇 Top 3 styling
+                if i == 1:
+                    prefix = "🥇"
+                elif i == 2:
+                    prefix = "🥈"
+                elif i == 3:
+                    prefix = "🥉"
+                else:
+                    prefix = f"{i}."
+
+                message += f"{prefix} @{name} — {points} pts\n"
+
+        # ✅ SEND WITHOUT MARKDOWN
+        await update.message.reply_text(message)
+
+    except Exception as e:
+        await update.message.reply_text(f"❌ Leaderboard error:\n{e}")
 async def profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     admin_id = 7356560699
@@ -120,7 +184,7 @@ async def profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 Username: @{username}
 Points: {data[1]}
-Exchange UID: {uid}
+Tapbit UID: {uid}
 Twitter: @{twitter}
 Status: {data[4]}
 """
@@ -310,29 +374,128 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.effective_user:
         return
 
+    if update.effective_chat.type == "private":
+        return
+
     user = update.effective_user
-    text = update.message.text
+    message = update.message
+    text = message.text
 
     if not text or text.startswith("/"):
         return
+    # 🚀 Auto crypto price detection
+    coin = text.strip().upper()
 
+    coin_ids = {
+        "BTC": "bitcoin",
+        "ETH": "ethereum",
+        "SOL": "solana",
+        "BNB": "binancecoin",
+        "XRP": "ripple",
+        "DOGE": "dogecoin",
+        "PEPE": "pepe",
+        "ZEC": "zcash",
+        "ETC": "ethereum-classic",
+        "ADA": "cardano"
+    }
+
+    if coin in coin_ids:
+        try:
+            response = requests.get(
+                "https://api.coingecko.com/api/v3/coins/markets",
+                params={
+                    "vs_currency": "usd",
+                    "ids": coin_ids[coin],
+                    "price_change_percentage": "24h"
+                },
+                timeout=10
+            )
+
+            response.raise_for_status()
+
+            data = response.json()
+            market = data[0]
+
+            price = market["current_price"]
+            high_24h = market["high_24h"]
+            low_24h = market["low_24h"]
+            volume_24h = market["total_volume"]
+            change_24h = market["price_change_percentage_24h"]
+
+            # Smart price formatting
+            def format_price(value):
+                if value >= 1:
+                    return f"${value:,.2f}"
+                elif value >= 0.01:
+                    return f"${value:,.4f}"
+                elif value >= 0.0001:
+                    return f"${value:,.6f}"
+                else:
+                    return f"${value:,.10f}"
+
+            price_display = format_price(price)
+            high_display = format_price(high_24h)
+            low_display = format_price(low_24h)
+
+            if change_24h >= 0:
+                change_icon = "🟢"
+            else:
+                change_icon = "🔴"
+
+            await update.message.reply_text(
+                f"💰 <b>{coin}/USDT</b>\n\n"
+                f"💵 <b>Price:</b> {price_display}\n"
+                f"📈 <b>24H High:</b> {high_display}\n"
+                f"📉 <b>24H Low:</b> {low_display}\n"
+                f"📊 <b>24H Volume:</b> ${volume_24h:,.0f}\n"
+                f"{change_icon} <b>24H Change:</b> {change_24h:+.2f}%\n\n"
+                f"⚡ <i>Market data powered by Tapbit</i>",
+                parse_mode="HTML"
+            )
+
+        except Exception as e:
+            print(f"Price error: {e}")
+            await update.message.reply_text(
+                f"❌ Couldn't get the {coin}/USDT market data right now."
+            )
+
+        return
+
+    # Detect links
+    link_pattern = re.compile(
+        r"(https?://\S+|www\.\S+|t\.me/\S+|telegram\.me/\S+)",
+        re.IGNORECASE
+    )
+
+    # Check if user is an admin
+    member = await context.bot.get_chat_member(
+        update.effective_chat.id,
+        user.id
+    )
+
+    is_admin = member.status in (
+        ChatMemberStatus.ADMINISTRATOR,
+        ChatMemberStatus.OWNER
+    )
+
+    # Delete links from non-admins
+    if link_pattern.search(text) and not is_admin:
+        try:
+            await message.delete()
+            print(f"🚫 Deleted link from @{user.username}")
+        except Exception as e:
+            print(f"❌ Could not delete link: {e}")
+        return
+
+    # Normal message = +1 point
     now = int(time.time())
 
-    # AUTO REGISTER
     cursor.execute("""
-        INSERT OR IGNORE INTO users 
+        INSERT OR IGNORE INTO users
         (user_id, username, points, kyc_status, last_redeem, last_daily, streak, last_message)
         VALUES (?, ?, 0, 'normal', 0, 0, 0, 0)
     """, (user.id, user.username or "no_username"))
 
-    # CHECK COOLDOWN
-    cursor.execute("SELECT last_message FROM users WHERE user_id=?", (user.id,))
-    data = cursor.fetchone()
-
-    if data and data[0] and now - data[0] < 10:
-        return  # ⛔ ignore spam (10 sec cooldown)
-
-    # GIVE POINT
     cursor.execute("""
         UPDATE users
         SET points = points + 1,
@@ -349,9 +512,10 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 /start - Register  
 /daily - Claim reward  
 /points - Check balance  
-/Leaderboard - Top users  
+/leaderboard - Top users  
 /profile - Your info
-/setuid [ENTER YOUR UID] -For uid registration  
+/setuid [ENTER YOUR UID] -For uid registration
+/settwitter [ENTER YOUR TWITTER HANDLE] -For X registration  
 
 🔥 Stay active & earn more!
 """,
@@ -395,7 +559,6 @@ async def settwitter(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     twitter = context.args[0].replace("@", "")
 
-    # ✅ BASIC VALIDATION
     if len(twitter) < 3 or len(twitter) > 15:
         await update.message.reply_text("❌ Invalid username length (3–15 chars)")
         return
@@ -409,6 +572,47 @@ async def settwitter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """, (twitter, user.id))
 
     conn.commit()
+
+    # ✅ THIS WAS MISSING
+    await update.message.reply_text(f"✅ Twitter username saved: @{twitter}")
+async def removepoint(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    admin_id = 7356560699
+
+    if update.effective_user.id != admin_id:
+        await update.message.reply_text("❌ Not allowed")
+        return
+
+    try:
+        username = context.args[0].replace("@", "")
+        amount = int(context.args[1])
+
+        cursor.execute("SELECT points FROM users WHERE username=?", (username,))
+        user = cursor.fetchone()
+
+        if not user:
+            await update.message.reply_text("User not found")
+            return
+
+        old_points = user[0]
+
+        cursor.execute(
+            "UPDATE users SET points = points - ? WHERE username=?",
+            (amount, username)
+        )
+        conn.commit()
+
+        new_points = old_points - amount
+
+        await update.message.reply_text(
+            f"❌ @{username}\n\n"
+            f"Old Points: {old_points}\n"
+            f"Removed: -{amount}\n"
+            f"New Points: {new_points}"
+        )
+
+    except Exception as e:
+        await update.message.reply_text(f"Error: {e}")
+
 
     await update.message.reply_text(f"✅ Twitter username saved: @{twitter}")
 
@@ -430,8 +634,23 @@ app.add_handler(CommandHandler("help", help_cmd))
 app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new))
 app.add_handler(CommandHandler("setuid", setuid))
 app.add_handler(CommandHandler("settwitter", settwitter))
+app.add_handler(CommandHandler("removepoint", removepoint))
 
 import asyncio
 
+async def main():
+    async with app:
+        await app.initialize()
+        await app.start()
+        await app.updater.start_polling()
+
+        print("✅ BOT STARTED SUCCESSFULLY")
+
+        while True:
+            await asyncio.sleep(3600)
+
 if __name__ == "__main__":
-    asyncio.run(app.run_polling())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print("🔥 CRASH ERROR:", e)
