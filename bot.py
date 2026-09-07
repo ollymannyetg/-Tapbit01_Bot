@@ -495,6 +495,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             response.raise_for_status()
             data = response.json()
+            print("ALPHA VANTAGE RESPONSE:", data)
 
             quote = data.get("Global Quote", {})
 
