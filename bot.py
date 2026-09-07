@@ -555,7 +555,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if coin in coin_ids:
-        btc_logo_url = "https://cryptologos.cc/logos/bitcoin-btc-logo.png"
         try:
             response = requests.get(
                 "https://api.coingecko.com/api/v3/coins/markets",
@@ -609,9 +608,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 change_icon = "🔴"
 
-            await update.message.reply_photo(
-                photo=btc_logo_url,
-                caption=(
+            await update.message.reply_text(
+                (
                     f"💰 <b>{coin}/USDT</b>\n\n"
                     f"💵 <b>Price:</b> {price_display}\n"
                     f"📈 <b>24H High:</b> {high_display}\n"
