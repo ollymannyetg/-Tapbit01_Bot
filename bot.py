@@ -441,6 +441,33 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     coin = clean_text
     coin = coin_aliases.get(coin, coin)
 
+    coin_aliases = {
+        "BITCOIN": "BTC",
+        "ETHEREUM": "ETH",
+        "SOLANA": "SOL",
+        "BINANCECOIN": "BNB",
+        "RIPPLE": "XRP",
+        "DOGECOIN": "DOGE",
+        "PEPE": "PEPE",
+        "ZCASH": "ZEC",
+        "ETHEREUMCLASSIC": "ETC",
+        "CARDANO": "ADA",
+        "TRON": "TRX",
+        "AVALANCHE": "AVAX",
+        "POLKADOT": "DOT",
+        "CHAINLINK": "LINK",
+        "LITECOIN": "LTC",
+        "BITCOINCASH": "BCH",
+        "COSMOS": "ATOM",
+        "UNISWAP": "UNI",
+        "AAVE": "AAVE",
+        "NEAR": "NEAR",
+        "APTOS": "APT",
+        "ARBITRUM": "ARB",
+        "OPTIMISM": "OP",
+        "POLYGON": "POL"
+    }
+
     coin_ids = {
         "BTC": "bitcoin",
         "ETH": "ethereum",
