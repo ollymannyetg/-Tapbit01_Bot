@@ -480,6 +480,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
 
     if coin in stock_symbols:
+        print("🔥 STOCK CODE REACHED:", coin)
         try:
             api_key = os.getenv("ALPHA_VANTAGE_KEY")
 
