@@ -836,11 +836,38 @@ app.add_handler(CommandHandler("removepoint", removepoint))
 
 import asyncio
 
+async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
+    try:
+        response = requests.get(
+            "https://api.coingecko.com/api/v3/simple/price",
+            params={
+                "ids": "bitcoin",
+                "vs_currencies": "usd"
+            },
+            timeout=10
+        )
+
+        response.raise_for_status()
+        data = response.json()
+
+        btc_price = data["bitcoin"]["usd"]
+
+        print(f"📡 BTC ALERT CHECK: ${btc_price:,.2f}")
+
+    except Exception as e:
+        print(f"❌ BTC alert error: {e}")
+        
 async def main():
     async with app:
         await app.initialize()
         await app.start()
         await app.updater.start_polling()
+
+        app.job_queue.run_repeating(
+            btc_price_alert,
+            interval=60,
+            first=10
+        )
 
         print("✅ BOT STARTED SUCCESSFULLY")
 
