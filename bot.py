@@ -383,8 +383,61 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not text or text.startswith("/"):
         return
+        
+    # 📰 Any news
+    if "any news" in text.lower():
+        try:
+            response = requests.get(
+                "https://api.coingecko.com/api/v3/coins/markets",
+                params={
+                    "vs_currency": "usd",
+                    "ids": "bitcoin,ethereum,solana",
+                    "price_change_percentage": "24h"
+                },
+                timeout=10
+            )
+
+            response.raise_for_status()
+            data = response.json()
+
+            message = "📰 <b>MARKET UPDATE</b>\n\n"
+
+            for market in data:
+                coin = market["symbol"].upper()
+                price = market["current_price"]
+                change = market["price_change_percentage_24h"]
+
+                icon = "🟢" if change >= 0 else "🔴"
+
+                message += (
+                    f"💰 <b>{coin}/USDT</b>\n"
+                    f"💵 Price: ${price:,.2f}\n"
+                    f"{icon} 24H Change: {change:+.2f}%\n\n"
+                )
+
+            message += "⚡ <i>Market data powered by Tapbit</i>"
+
+            await update.message.reply_text(
+                message,
+                parse_mode="HTML"
+            )
+
+        except Exception as e:
+            print(f"News/market error: {e}")
+            await update.message.reply_text(
+                "❌ Couldn't get the market update right now."
+            )
+
+        return
+        
     # 🚀 Auto crypto price detection
-    coin = text.strip().upper()
+    clean_text = text.upper().strip()
+
+    clean_text = re.sub(r"[/\-]", " ", clean_text)
+    clean_text = re.sub(r"\b(PRICE|VALUE|RATE|USDT)\b", "", clean_text)
+    clean_text = re.sub(r"[^A-Z0-9]", "", clean_text)
+
+    coin = clean_text
 
     coin_ids = {
         "BTC": "bitcoin",
@@ -396,7 +449,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "PEPE": "pepe",
         "ZEC": "zcash",
         "ETC": "ethereum-classic",
-        "ADA": "cardano"
+        "ADA": "cardano",
+        "TRX": "tron",
+        "AVAX": "avalanche-2",
+        "DOT": "polkadot",
+        "LINK": "chainlink",
+        "LTC": "litecoin",
+        "BCH": "bitcoin-cash",
+        "ATOM": "cosmos",
+        "UNI": "uniswap",
+        "AAVE": "aave",
+        "NEAR": "near",
+        "APT": "aptos",
+        "ARB": "arbitrum",
+        "OP": "optimism",
+        "POL": "polygon-ecosystem-token"
     }
 
     if coin in coin_ids:
