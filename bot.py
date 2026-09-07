@@ -510,8 +510,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if coin in stock_symbols:
         print("🔥 STOCK CODE REACHED:", coin)
+
         try:
             api_key = os.getenv("ALPHA_VANTAGE_KEY")
+
+            if not api_key:
+                raise ValueError("ALPHA_VANTAGE_KEY is not set")
 
             response = requests.get(
                 "https://www.alphavantage.co/query",
@@ -524,6 +528,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
             response.raise_for_status()
+
             data = response.json()
             print("ALPHA VANTAGE RESPONSE:", data)
 
@@ -532,27 +537,31 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not quote:
                 raise ValueError("No stock data returned")
 
-            price = float(quote["05. price"])
-            change = float(quote["09. change"])
-            change_percent = quote["10. change percent"]
+            price = float(quote.get("05. price", 0))
+            change = float(quote.get("09. change", 0))
+            change_percent = quote.get("10. change percent", "0%")
+            volume = float(quote.get("06. volume", 0))
+
+            if price <= 0:
+                raise ValueError("Invalid stock price")
 
             icon = "🟢" if change >= 0 else "🔴"
 
             await update.message.reply_text(
                 (
-                    f"💰 <b>{coin}/USDT</b>\n\n"
-                    f"💵 <b>Price:</b> {price_display}\n"
-                    f"📈 <b>24H High:</b> {high_display}\n"
-                    f"📉 <b>24H Low:</b> {low_display}\n"
-                    f"📊 <b>24H Volume:</b> ${volume_24h:,.0f}\n"
-                    f"{change_icon} <b>24H Change:</b> {change_24h:+.2f}%\n\n"
-                    f"⚡ <i>Market data powered by Tapbit</i>"
+                    f"💰 <b>{coin}</b>\n\n"
+                    f"💵 <b>Price:</b> ${price:,.2f}\n"
+                    f"📊 <b>Volume:</b> {volume:,.0f}\n"
+                    f"{icon} <b>Change:</b> {change_percent}\n\n"
+                    f"⚡ <i>{stock_symbols[coin]}</i>"
                 ),
                 parse_mode="HTML",
                 reply_markup=reply_markup
             )
+
         except Exception as e:
             print("STOCK ERROR:", repr(e))
+
             await update.message.reply_text(
                 f"❌ Couldn't get {coin} stock data right now."
             )
