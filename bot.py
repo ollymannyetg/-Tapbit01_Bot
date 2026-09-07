@@ -399,6 +399,11 @@ async def daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text(f"❌ Error in /daily:\n{e}")
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        global btc_alert_chat_id
+
+    if update.effective_chat.type != "private":
+        btc_alert_chat_id = update.effective_chat.id 
+        
     if not update.message or not update.effective_user:
         return
 
@@ -836,6 +841,9 @@ app.add_handler(CommandHandler("removepoint", removepoint))
 
 import asyncio
 
+btc_alert_state = None
+btc_alert_chat_id = None
+
 async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
     try:
         response = requests.get(
@@ -853,6 +861,34 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
         btc_price = data["bitcoin"]["usd"]
 
         print(f"📡 BTC ALERT CHECK: ${btc_price:,.2f}")
+                global btc_alert_state, btc_alert_chat_id
+
+        if btc_alert_chat_id is None:
+            print("⚠️ BTC alert group not detected yet.")
+            return
+
+        if btc_alert_state is None:
+            btc_alert_state = btc_price >= 80000
+            return
+
+        if btc_price >= 80000 and not btc_alert_state:
+            await context.bot.send_message(
+                chat_id=btc_alert_chat_id,
+                text=(
+                    "🚨 BTC PRICE ALERT\n\n"
+                    "₿ Bitcoin has crossed $80,000!\n\n"
+                    f"💵 Current Price: ${btc_price:,.2f}\n"
+                    "📈 Level: $80K crossed\n\n"
+                    "🔥 Momentum watch is ON.\n\n"
+                    "Trade responsibly. DYOR."
+                )
+            )
+
+            btc_alert_state = True
+
+        elif btc_price < 80000:
+            btc_alert_state = False
+        
 
     except Exception as e:
         print(f"❌ BTC alert error: {e}")
