@@ -439,10 +439,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     clean_text = re.sub(r"[^A-Z0-9]", "", clean_text)
 
     coin = clean_text
+    coin = coin_aliases.get(coin, coin)
 
     coin_ids = {
         "BTC": "bitcoin",
-        "BITCOIN": "bitcoin",
         "ETH": "ethereum",
         "SOL": "solana",
         "BNB": "binancecoin",
