@@ -466,6 +466,63 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "POL": "polygon-ecosystem-token"
     }
 
+    stock_symbols = {
+        "AAPL": "Apple",
+        "TSLA": "Tesla",
+        "NVDA": "NVIDIA",
+        "MSFT": "Microsoft",
+        "AMZN": "Amazon",
+        "GOOGL": "Alphabet",
+        "META": "Meta",
+        "NFLX": "Netflix",
+        "AMD": "AMD",
+        "COIN": "Coinbase"
+    }
+
+    if coin in stock_symbols:
+        try:
+            api_key = os.getenv("ALPHA_VANTAGE_KEY")
+
+            response = requests.get(
+                "https://www.alphavantage.co/query",
+                params={
+                    "function": "GLOBAL_QUOTE",
+                    "symbol": coin,
+                    "apikey": api_key
+                },
+                timeout=10
+            )
+
+            response.raise_for_status()
+            data = response.json()
+
+            quote = data.get("Global Quote", {})
+
+            if not quote:
+                raise ValueError("No stock data returned")
+
+            price = float(quote["05. price"])
+            change = float(quote["09. change"])
+            change_percent = quote["10. change percent"]
+
+            icon = "🟢" if change >= 0 else "🔴"
+
+            await update.message.reply_text(
+                f"🏢 <b>{stock_symbols[coin]} ({coin})</b>\n\n"
+                f"💵 <b>Price:</b> ${price:,.2f}\n"
+                f"{icon} <b>Change:</b> {change:+,.2f} ({change_percent})\n\n"
+                f"📈 <i>US Stock Market</i>",
+                parse_mode="HTML"
+            )
+
+        except Exception as e:
+            print(f"Stock price error: {e}")
+            await update.message.reply_text(
+                f"❌ Couldn't get {coin} stock data right now."
+            )
+
+        return
+    
     if coin in coin_ids:
         try:
             response = requests.get(
