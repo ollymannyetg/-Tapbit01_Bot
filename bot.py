@@ -600,8 +600,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard = [
                 [
                     InlineKeyboardButton(
-                        f"🚀 Trade {coin} on Tapbit",
-                        url="https://www.tapbit.com"
+                        "SIGN UP",
+                        url="https://www.tapbit.com/en/register"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        "SPOT",
+                        url="https://www.tapbit.com/en/markets"
+                    ),
+                    InlineKeyboardButton(
+                        "FUTURES",
+                        url="https://www.tapbit.com/en/markets"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        "EVENTS",
+                        url="https://www.tapbit.com/en/event/"
                     )
                 ]
             ]
