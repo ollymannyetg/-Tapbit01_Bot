@@ -718,17 +718,121 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """,
         parse_mode="Markdown"
     )
-async def welcome_new(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    for member in update.message.new_chat_members:
-        await update.message.reply_text(
-            f"""
-🎉 Welcome {member.first_name}!
+import asyncio
 
-🚀 Type /start to join Tapbit Rewards  
-💰 Start earning points instantly  
-🏆 Compete on leaderboard
-""",
-            parse_mode="Markdown"
+welcome_pending = {}
+
+
+async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not update.message or not update.message.new_chat_members:
+        return
+
+    chat_id = update.effective_chat.id
+
+    new_members = []
+
+    for user in update.message.new_chat_members:
+        if user.is_bot:
+            continue
+
+        if user.username:
+            new_members.append(f"@{user.username}")
+        else:
+            new_members.append(user.mention_html())
+
+    if not new_members:
+        return
+
+    if chat_id not in welcome_pending:
+        welcome_pending[chat_id] = {
+            "members": [],
+            "task": None
+        }
+
+    welcome_pending[chat_id]["members"].extend(new_members)
+
+    if welcome_pending[chat_id]["task"] is None:
+
+        async def send_welcome():
+
+            await asyncio.sleep(5)
+
+            data = welcome_pending.get(chat_id)
+
+            if not data:
+                return
+
+            members = data["members"]
+
+            member_text = " • ".join(members)
+
+            text = (
+                "🟡 <b>WELCOME TO TAPBIT</b>\n\n"
+
+                f"👋 Welcome <b>{member_text}</b> to the Tapbit community!\n\n"
+
+                "We're happy to have you here. 🚀\n\n"
+
+                "🛡️ <b>Stay Safe</b>\n"
+                "• Tapbit admins/moderators will never DM you first "
+                "asking for funds or sensitive information.\n"
+                "• Beware of impersonators and suspicious links.\n\n"
+
+                "📜 <b>Community Guidelines</b>\n"
+                "• No spam\n"
+                "• No unsolicited promotions\n"
+                "• No trading signals\n"
+                "• No scam/phishing links\n"
+                "• Respect everyone\n\n"
+
+                "💬 <b>Need Help?</b>\n"
+                "Our moderators are here to guide you.\n\n"
+
+                "🚀 <b>Trade smarter. Trade with Tapbit.</b>"
+            )
+
+            keyboard = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton(
+                        "🌐 Tapbit Website",
+                        url="https://www.tapbit.com/"
+                    ),
+                    InlineKeyboardButton(
+                        "📢 Announcements",
+                        url="https://t.me/Tapbit_Ann"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        "🎁 Promotions",
+                        url="https://x.com/Tapbitglobal"
+                    ),
+                    InlineKeyboardButton(
+                        "💬 Community",
+                        url="https://t.me/TapbitGlobalOfficial"
+                    )
+                ]
+            ])
+
+            try:
+                with open("welcome.jpg", "rb") as photo:
+
+                    await context.bot.send_photo(
+                        chat_id=chat_id,
+                        photo=photo,
+                        caption=text,
+                        parse_mode="HTML",
+                        reply_markup=keyboard
+                    )
+
+            except Exception as e:
+                print(f"Welcome message error: {e}")
+
+            welcome_pending.pop(chat_id, None)
+
+        welcome_pending[chat_id]["task"] = asyncio.create_task(
+            send_welcome()
         )
 async def setuid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -828,7 +932,7 @@ app.add_handler(CommandHandler("tasks", tasks))
 app.add_handler(CommandHandler("daily", daily))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 app.add_handler(CommandHandler("help", help_cmd))
-app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new))
+app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_members))
 app.add_handler(CommandHandler("setuid", setuid))
 app.add_handler(CommandHandler("settwitter", settwitter))
 app.add_handler(CommandHandler("removepoint", removepoint))
