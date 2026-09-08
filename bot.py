@@ -835,6 +835,9 @@ app.add_handler(CommandHandler("removepoint", removepoint))
 import asyncio
 
 btc_alert_state = None
+eth_alert_state = None
+sol_alert_state = None
+
 btc_alert_chat_id = None
 
 async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
@@ -885,6 +888,78 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         print(f"❌ BTC alert error: {e}")
+async def eth_sol_price_alert(context: ContextTypes.DEFAULT_TYPE):
+    global eth_alert_state, sol_alert_state, btc_alert_chat_id
+
+    try:
+        response = requests.get(
+            "https://api.coingecko.com/api/v3/simple/price",
+            params={
+                "ids": "ethereum,solana",
+                "vs_currencies": "usd"
+            },
+            timeout=10
+        )
+
+        response.raise_for_status()
+        data = response.json()
+
+        eth_price = data["ethereum"]["usd"]
+        sol_price = data["solana"]["usd"]
+
+        print(f"📡 ETH ALERT CHECK: ${eth_price:,.2f}")
+        print(f"📡 SOL ALERT CHECK: ${sol_price:,.2f}")
+
+        if btc_alert_chat_id is None:
+            print("⚠️ ETH/SOL alert group not detected yet.")
+            return
+
+        # ETH $2,500 alert
+        if eth_alert_state is None:
+            eth_alert_state = eth_price >= 2500
+
+        elif eth_price >= 2500 and not eth_alert_state:
+            await context.bot.send_message(
+                chat_id=btc_alert_chat_id,
+                text=(
+                    "🚨 ETH PRICE ALERT\n\n"
+                    "Ξ Ethereum has crossed $2,500!\n\n"
+                    f"💵 Current Price: ${eth_price:,.2f}\n"
+                    "📈 Level: $2,500 crossed\n\n"
+                    "🔥 Momentum watch is ON.\n\n"
+                    "Trade responsibly. DYOR."
+                )
+            )
+
+            eth_alert_state = True
+
+        elif eth_price < 2500:
+            eth_alert_state = False
+
+        # SOL $110 alert
+        if sol_alert_state is None:
+            sol_alert_state = sol_price >= 110
+
+        elif sol_price >= 110 and not sol_alert_state:
+            await context.bot.send_message(
+                chat_id=btc_alert_chat_id,
+                text=(
+                    "🚨 SOL PRICE ALERT\n\n"
+                    "◎ Solana has crossed $110!\n\n"
+                    f"💵 Current Price: ${sol_price:,.2f}\n"
+                    "📈 Level: $110 crossed\n\n"
+                    "🔥 Momentum watch is ON.\n\n"
+                    "Trade responsibly. DYOR."
+                )
+            )
+
+            sol_alert_state = True
+
+        elif sol_price < 110:
+            sol_alert_state = False
+
+    except Exception as e:
+        print(f"❌ ETH/SOL alert error: {e}")
         
 async def main():
     async with app:
@@ -896,6 +971,12 @@ async def main():
             btc_price_alert,
             interval=60,
             first=10
+        )
+
+        app.job_queue.run_repeating(
+            eth_sol_price_alert,
+            interval=60,
+            first=20
         )
 
         print("✅ BOT STARTED SUCCESSFULLY")
