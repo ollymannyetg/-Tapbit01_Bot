@@ -695,7 +695,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         UPDATE users
         SET points = points + 1
         WHERE user_id = ?
-    """, (user.id))
+    """, (user.id,))
 
     conn.commit()
     
