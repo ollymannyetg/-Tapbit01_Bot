@@ -736,10 +736,7 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
         if user.is_bot:
             continue
 
-        if user.username:
-            new_members.append(f"@{user.username}")
-        else:
-            new_members.append(user.mention_html())
+        new_members.append(f"📍{user.id}📍")
 
     if not new_members:
         return
@@ -770,26 +767,46 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
             text = (
                 "🟡 <b>WELCOME TO TAPBIT</b>\n\n"
 
-                f"👋 Welcome <b>{member_text}</b> to the Tapbit community!\n\n"
+                f"👋 Hey! {member_text} Welcome to the Tapbit community!\n\n"
 
-                "We're happy to have you here. 🚀\n\n"
+                "🚀 <b>Your All-in-One Crypto Trading Platform</b>\n\n"
+
+                "🌍 <b>Trade Crypto Your Way</b>\n"
+                "• Spot Trading with 100+ quality assets\n"
+                "• Futures & Derivatives with long/short trading\n"
+                "• Copy Trading — follow experienced traders\n"
+                "• Earn & exciting trading campaigns\n"
+                "• Buy Crypto with supported payment methods\n\n"
+
+                "⚡ <b>Built for Traders</b>\n"
+                "• Deep trading liquidity\n"
+                "• Competitive trading fees\n"
+                "• Take Profit & Stop Loss tools\n"
+                "• Advanced risk-control systems\n"
+                "• Powerful trading infrastructure\n\n"
+
+                "🔐 <b>Security You Can Trust</b>\n"
+                "• 1:1 Proof of Reserves\n"
+                "• $50M Insurance Fund\n"
+                "• Hot & Cold Wallet Separation\n"
+                "• Multi-Signature Security\n"
+                "• 2FA & Advanced Account Protection\n\n"
+
+                "🎁 <b>Don't Miss Out</b>\n"
+                "Keep an eye on our announcements and promotions "
+                "for the latest events, rewards and trading opportunities.\n\n"
 
                 "🛡️ <b>Stay Safe</b>\n"
-                "• Tapbit admins/moderators will never DM you first "
-                "asking for funds or sensitive information.\n"
-                "• Beware of impersonators and suspicious links.\n\n"
-
-                "📜 <b>Community Guidelines</b>\n"
-                "• No spam\n"
-                "• No unsolicited promotions\n"
-                "• No trading signals\n"
-                "• No scam/phishing links\n"
-                "• Respect everyone\n\n"
+                "Tapbit admins and moderators will never DM you first "
+                "asking for funds, passwords or verification codes.\n"
+                "Beware of impersonators and suspicious links.\n\n"
 
                 "💬 <b>Need Help?</b>\n"
                 "Our moderators are here to guide you.\n\n"
 
-                "🚀 <b>Trade smarter. Trade with Tapbit.</b>"
+                "🚀 <b>Trade smarter. Trade with Tapbit.</b>\n\n"
+
+                "👇 <b>Useful links to get started:</b>"
             )
 
             keyboard = InlineKeyboardMarkup([
