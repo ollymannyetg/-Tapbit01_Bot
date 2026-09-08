@@ -670,25 +670,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         re.IGNORECASE
     )
 
-    # Check if user is an admin
-    member = await context.bot.get_chat_member(
-        update.effective_chat.id,
-        user.id
+    link_pattern = re.compile(
+        r"(https?://\S+|www\.\S+|t\.me/\S+|telegram\.me/\S+)",
+        re.IGNORECASE
     )
 
-    is_admin = member.status in (
-        ChatMemberStatus.ADMINISTRATOR,
-        ChatMemberStatus.OWNER
-    )
+    # Link protection
+    # Bot is not an admin, so it cannot check user permissions.
+    # Link deletion is disabled for now.
 
-    # Delete links from non-admins
-    if link_pattern.search(text) and not is_admin:
-        try:
-            await message.delete()
-            print(f"🚫 Deleted link from @{user.username}")
-        except Exception as e:
-            print(f"❌ Could not delete link: {e}")
-        return
+    if link_pattern.search(text):
+        print(f"🔗 Link detected from @{user.username} (not deleted — bot is not admin)")
 
     # Normal message = +1 point
     now = int(time.time())
