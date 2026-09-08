@@ -399,7 +399,7 @@ async def daily(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text(f"❌ Error in /daily:\n{e}")
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        global btc_alert_chat_id
+    global btc_alert_chat_id
 
     if update.effective_chat.type != "private":
         btc_alert_chat_id = update.effective_chat.id 
@@ -845,6 +845,8 @@ btc_alert_state = None
 btc_alert_chat_id = None
 
 async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
+    global btc_alert_state, btc_alert_chat_id
+
     try:
         response = requests.get(
             "https://api.coingecko.com/api/v3/simple/price",
@@ -861,7 +863,6 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
         btc_price = data["bitcoin"]["usd"]
 
         print(f"📡 BTC ALERT CHECK: ${btc_price:,.2f}")
-                global btc_alert_state, btc_alert_chat_id
 
         if btc_alert_chat_id is None:
             print("⚠️ BTC alert group not detected yet.")
@@ -888,7 +889,6 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
 
         elif btc_price < 80000:
             btc_alert_state = False
-        
 
     except Exception as e:
         print(f"❌ BTC alert error: {e}")
