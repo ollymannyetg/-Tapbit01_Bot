@@ -403,6 +403,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if update.effective_chat.type != "private":
         btc_alert_chat_id = update.effective_chat.id 
+        print(f"✅ BTC ALERT GROUP DETECTED: {btc_alert_chat_id}")
         
     if not update.message or not update.effective_user:
         return
