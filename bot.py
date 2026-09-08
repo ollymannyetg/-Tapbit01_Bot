@@ -687,18 +687,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     cursor.execute("""
         INSERT OR IGNORE INTO users
-        (user_id, username, points, kyc_status, last_redeem, last_daily, streak, last_message)
-        VALUES (?, ?, 0, 'normal', 0, 0, 0, 0)
+        (user_id, username, points, kyc_status, last_redeem, last_daily, streak)
+        VALUES (?, ?, 0, 'normal', 0, 0, 0)
     """, (user.id, user.username or "no_username"))
 
     cursor.execute("""
         UPDATE users
-        SET points = points + 1,
-            last_message = ?
+        SET points = points + 1
         WHERE user_id = ?
-    """, (now, user.id))
+    """, (user.id))
 
     conn.commit()
+    
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         """
