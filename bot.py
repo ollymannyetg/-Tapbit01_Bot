@@ -1069,8 +1069,110 @@ async def eth_sol_price_alert(context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         print(f"❌ ETH/SOL alert error: {e}")
-        
-async def main():
+
+security_reminder_message_id = None
+
+async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
+        global security_reminder_message_id, btc_alert_chat_id
+
+    if btc_alert_chat_id is None:
+        print("⚠️ Security reminder group not detected yet.")
+        return
+
+    # Delete previous reminder
+    if security_reminder_message_id:
+        try:
+            await context.bot.delete_message(
+                chat_id=btc_alert_chat_id,
+                message_id=security_reminder_message_id
+            )
+        except Exception as e:
+            print(f"⚠️ Could not delete previous security reminder: {e}")
+
+    text = (
+        "❗️ <b>Important Reminder</b> ❗️\n\n"
+
+        "⛔️ <b>Beware of Scammers!</b>\n"
+        "• Tapbit staff will never ask for your account password, "
+        "PIN, Google OTP, SMS code, or email verification code. "
+        "Never share these details with anyone.\n\n"
+
+        "💁 <b>Official Support</b>\n"
+        "• Our community moderators can guide you to official "
+        "resources, but they will never ask you to send funds "
+        "or provide sensitive account information.\n\n"
+
+        "• Be cautious of anyone claiming to represent Tapbit "
+        "and contacting you unexpectedly.\n\n"
+
+        "🚨 <b>Stay Safe Online</b>\n"
+        "• Tapbit's official website is tapbit.com. "
+        "Avoid suspicious or fake links and always verify "
+        "before logging in.\n\n"
+
+        "💌 <b>Community Guidelines</b>\n"
+        "• No offensive language, imagery, discrimination, "
+        "scams, or unauthorized promotions.\n\n"
+
+        "➡️ <b>Need Help?</b>\n"
+        "Contact Tapbit through our official support channels "
+        "and verify suspicious activity before taking action."
+    )
+
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "🎁 DEPOSIT REWARD COUPON UP TO $4,000",
+                url="https://www.tapbit.com/en/login"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "📱 iOS APP",
+                url="https://www.tapbit.com/download"
+            ),
+            InlineKeyboardButton(
+                "📱 Android APP",
+                url="https://www.tapbit.com/download"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "💻 WEBSITE",
+                url="https://www.tapbit.com/"
+            ),
+            InlineKeyboardButton(
+                "🌐 COMMUNITY",
+                url="https://t.me/TapbitGlobalOfficial"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🎁 BONUS",
+                url="https://x.com/Tapbitglobal"
+            ),
+            InlineKeyboardButton(
+                "👨‍💼 CUSTOMER SERVICE",
+                url="https://www.tapbit.com/en/support"
+            )
+        ]
+    ])
+
+    try:
+        with open("security.jpg", "rb") as photo:
+            sent_message = await context.bot.send_photo(
+                chat_id=btc_alert_chat_id,
+                photo=photo,
+                caption=text,
+                parse_mode="HTML",
+                reply_markup=keyboard
+            )
+
+        security_reminder_message_id = sent_message.message_id
+        print("✅ Security reminder sent successfully.")
+
+    except Exception as e:
+        print(f"❌ Security reminder error: {e}")
     async with app:
         await app.initialize()
         await app.start()
@@ -1086,6 +1188,12 @@ async def main():
             eth_sol_price_alert,
             interval=60,
             first=20
+        )
+
+            app.job_queue.run_repeating(
+            security_reminder,
+            interval=3600,
+            first=30
         )
 
         print("✅ BOT STARTED SUCCESSFULLY")
