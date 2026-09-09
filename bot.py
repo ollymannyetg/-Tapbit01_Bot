@@ -754,7 +754,6 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         async def send_welcome():
 
-            await asyncio.sleep(5)
 
             data = welcome_pending.get(chat_id)
 
@@ -779,11 +778,6 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
                 "• Copy Trading\n"
                 "• Earn & trading campaigns\n"
                 "• Buy Crypto with supported payment methods\n\n"
-
-                "⚡ <b>Built for Traders</b>\n"
-                "• Deep liquidity & competitive fees\n"
-                "• Take Profit & Stop Loss tools\n"
-                "• Advanced risk-control systems\n\n"
 
                 "🔐 <b>Security You Can Trust</b>\n"
                 "• 1:1 Proof of Reserves\n"
