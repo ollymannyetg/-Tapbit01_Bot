@@ -770,42 +770,31 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
 
                 f"👋 Hey! {member_text} Welcome to the Tapbit community!\n\n"
 
-                "🚀 <b>Your All-in-One Crypto Trading Platform</b>\n\n"
-
-                "🌍 <b>Trade Crypto Your Way</b>\n"
+                "🚀 <b>Trade Crypto Your Way</b>\n"
                 "• Spot Trading with 100+ quality assets\n"
-                "• Futures & Derivatives with long/short trading\n"
-                "• Copy Trading — follow experienced traders\n"
-                "• Earn & exciting trading campaigns\n"
+                "• Futures & Derivatives\n"
+                "• Copy Trading\n"
+                "• Earn & trading campaigns\n"
                 "• Buy Crypto with supported payment methods\n\n"
 
                 "⚡ <b>Built for Traders</b>\n"
-                "• Deep trading liquidity\n"
-                "• Competitive trading fees\n"
+                "• Deep liquidity & competitive fees\n"
                 "• Take Profit & Stop Loss tools\n"
-                "• Advanced risk-control systems\n"
-                "• Powerful trading infrastructure\n\n"
+                "• Advanced risk-control systems\n\n"
 
                 "🔐 <b>Security You Can Trust</b>\n"
                 "• 1:1 Proof of Reserves\n"
                 "• $50M Insurance Fund\n"
-                "• Hot & Cold Wallet Separation\n"
-                "• Multi-Signature Security\n"
-                "• 2FA & Advanced Account Protection\n\n"
+                "• Hot/Cold wallet separation\n"
+                "• Multi-signature security & 2FA\n\n"
 
-                "🎁 <b>Don't Miss Out</b>\n"
-                "Keep an eye on our announcements and promotions "
-                "for the latest events, rewards and trading opportunities.\n\n"
+                "🎁 <b>Stay Updated</b>\n"
+                "Follow our announcements and promotions for "
+                "the latest events and rewards.\n\n"
 
                 "🛡️ <b>Stay Safe</b>\n"
-                "Tapbit admins and moderators will never DM you first "
-                "asking for funds, passwords or verification codes.\n"
-                "Beware of impersonators and suspicious links.\n\n"
-
-                "💬 <b>Need Help?</b>\n"
-                "Our moderators are here to guide you.\n\n"
-
-                "🚀 <b>Trade smarter. Trade with Tapbit.</b>\n\n"
+                "Admins and moderators will never DM you first "
+                "asking for funds, passwords or verification codes.\n\n"
 
                 "👇 <b>Useful links to get started:</b>"
             )
