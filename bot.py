@@ -1101,9 +1101,6 @@ async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
         "resources, but they will never ask you to send funds "
         "or provide sensitive account information.\n\n"
 
-        "• Be cautious of anyone claiming to represent Tapbit "
-        "and contacting you unexpectedly.\n\n"
-
         "🚨 <b>Stay Safe Online</b>\n"
         "• Tapbit's official website is tapbit.com. "
         "Avoid suspicious or fake links and always verify "
@@ -1115,13 +1112,14 @@ async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
 
         "➡️ <b>Need Help?</b>\n"
         "Contact Tapbit through our official support channels "
-        "and verify suspicious activity before taking action."
+        "and verify suspicious activity before taking action.\n\n"
+        "🔗 <b>Official Support:</b> https://www.tapbit.com/en/support"
     )
 
     keyboard = InlineKeyboardMarkup([
         [
             InlineKeyboardButton(
-                "🎁 DEPOSIT REWARD COUPON UP TO $4,000",
+                "🎁 DEPOSIT REWARD UP TO $4,000",
                 url="https://www.tapbit.com/en/login"
             )
         ],
