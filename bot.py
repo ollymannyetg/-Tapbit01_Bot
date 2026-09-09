@@ -919,7 +919,6 @@ async def removepoint(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"Error: {e}")
 
 
-    await update.message.reply_text(f"✅ Twitter username saved: @{twitter}")
 
 app = Application.builder().token(TOKEN).build()
 
@@ -1073,7 +1072,7 @@ async def eth_sol_price_alert(context: ContextTypes.DEFAULT_TYPE):
 security_reminder_message_id = None
 
 async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
-        global security_reminder_message_id, btc_alert_chat_id
+    global security_reminder_message_id, btc_alert_chat_id
 
     if btc_alert_chat_id is None:
         print("⚠️ Security reminder group not detected yet.")
@@ -1173,6 +1172,7 @@ async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         print(f"❌ Security reminder error: {e}")
+async def main():
     async with app:
         await app.initialize()
         await app.start()
@@ -1190,7 +1190,7 @@ async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
             first=20
         )
 
-            app.job_queue.run_repeating(
+        app.job_queue.run_repeating(
             security_reminder,
             interval=3600,
             first=30
