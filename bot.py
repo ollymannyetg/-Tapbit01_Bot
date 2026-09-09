@@ -763,7 +763,10 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
 
             members = data["members"]
 
-            member_text = " • ".join(members)
+            if len(members) <= 5:
+                member_text = "\n\n".join(members)
+            else:
+                member_text = f"📍 {len(members)} new members joined the community!"
 
             text = (
                 "🟡 <b>WELCOME TO TAPBIT</b>\n\n"
