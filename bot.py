@@ -498,6 +498,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "APT": "aptos",
         "ARB": "arbitrum",
         "OP": "optimism",
+        "CASHCAT": "cash-cat",
+        "PONS": "pons",
+        "USDG": "global-dollar",
         "POL": "polygon-ecosystem-token"
     }
 
@@ -946,7 +949,7 @@ btc_alert_state = None
 eth_alert_state = None
 sol_alert_state = None
 
-btc_alert_chat_id = None
+btc_alert_chat_id = -1001562378091
 
 async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
     global btc_alert_state, btc_alert_chat_id
