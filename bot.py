@@ -1122,7 +1122,7 @@ async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
     keyboard = InlineKeyboardMarkup([
         [
             InlineKeyboardButton(
-                "🎁 DEPOSIT REWARD UP TO $4,000",
+                "🎁 $4,000 DEPOSIT REWARD",
                 url="https://www.tapbit.com/en/login"
             )
         ],
