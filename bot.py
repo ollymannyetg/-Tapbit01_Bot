@@ -728,6 +728,7 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
     print("🔥 NEW MEMBER UPDATE RECEIVED")
 
     if not update.message or not update.message.new_chat_members:
+        return
 
     chat_id = update.effective_chat.id
 
@@ -738,7 +739,6 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
             continue
 
         new_members.append(f"📍{user.id}📍")
-
     if not new_members:
         return
 
