@@ -986,7 +986,7 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
                     "🚨 BTC PRICE ALERT\n\n"
                     "₿ Bitcoin has crossed $78,000!\n\n"
                     f"💵 Current Price: ${btc_price:,.2f}\n"
-                    "📈 Level: $80K crossed\n\n"
+                    "📈 Level: $78K crossed\n\n"
                     "🔥 Momentum watch is ON.\n\n"
                     "Trade responsibly. DYOR."
                 )
