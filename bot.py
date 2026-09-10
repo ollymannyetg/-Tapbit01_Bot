@@ -478,6 +478,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "BTC": "bitcoin",
         "ETH": "ethereum",
         "SOL": "solana",
+        "SUI": "sui",
         "BNB": "binancecoin",
         "XRP": "ripple",
         "DOGE": "dogecoin",
@@ -976,25 +977,37 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
             return
 
         if btc_alert_state is None:
-            btc_alert_state = btc_price >= 78000
+            btc_alert_state = btc_price >= 77000
             return
 
-        if btc_price >= 78000 and not btc_alert_state:
+        if btc_price >= 77000 and not btc_alert_state:
             await context.bot.send_message(
                 chat_id=btc_alert_chat_id,
                 text=(
                     "🚨 BTC PRICE ALERT\n\n"
-                    "₿ Bitcoin has crossed $78,000!\n\n"
+                    "₿ Bitcoin has crossed $77,000!\n\n"
                     f"💵 Current Price: ${btc_price:,.2f}\n"
-                    "📈 Level: $78K crossed\n\n"
+                    "📈 Level: $77K crossed\n\n"
                     "🔥 Momentum watch is ON.\n\n"
                     "Trade responsibly. DYOR."
-                )
+                ),
+                reply_markup=InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton(
+                            "🟢 LONG",
+                            url="https://www.tapbit.com/"
+                        ),
+                        InlineKeyboardButton(
+                            "🔴 SHORT",
+                            url="https://www.tapbit.com/"
+                        )
+                    ]
+                ])
             )
 
             btc_alert_state = True
 
-        elif btc_price < 78000:
+        elif btc_price < 77000:
             btc_alert_state = False
 
     except Exception as e:
@@ -1027,46 +1040,70 @@ async def eth_sol_price_alert(context: ContextTypes.DEFAULT_TYPE):
 
         # ETH $2,500 alert
         if eth_alert_state is None:
-            eth_alert_state = eth_price >= 2500
+            eth_alert_state = eth_price >= 2400
 
-        elif eth_price >= 2500 and not eth_alert_state:
+        elif eth_price >= 2400 and not eth_alert_state:
             await context.bot.send_message(
                 chat_id=btc_alert_chat_id,
                 text=(
                     "🚨 ETH PRICE ALERT\n\n"
-                    "Ξ Ethereum has crossed $2,500!\n\n"
+                    "Ξ Ethereum has crossed $2,400!\n\n"
                     f"💵 Current Price: ${eth_price:,.2f}\n"
-                    "📈 Level: $2,500 crossed\n\n"
+                    "📈 Level: $2,400 crossed\n\n"
                     "🔥 Momentum watch is ON.\n\n"
                     "Trade responsibly. DYOR."
-                )
+                ),
+                reply_markup=InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton(
+                            "🟢 LONG",
+                            url="https://www.tapbit.com/"
+                        ),
+                        InlineKeyboardButton(
+                            "🔴 SHORT",
+                            url="https://www.tapbit.com/"
+                        )
+                    ]
+                ])
             )
 
             eth_alert_state = True
 
-        elif eth_price < 2500:
+        elif eth_price < 2400:
             eth_alert_state = False
 
         # SOL $110 alert
         if sol_alert_state is None:
-            sol_alert_state = sol_price >= 110
+            sol_alert_state = sol_price >= 100
 
-        elif sol_price >= 110 and not sol_alert_state:
+        elif sol_price >= 100 and not sol_alert_state:
             await context.bot.send_message(
                 chat_id=btc_alert_chat_id,
                 text=(
                     "🚨 SOL PRICE ALERT\n\n"
-                    "◎ Solana has crossed $110!\n\n"
+                    "◎ Solana has crossed $100!\n\n"
                     f"💵 Current Price: ${sol_price:,.2f}\n"
-                    "📈 Level: $110 crossed\n\n"
+                    "📈 Level: $100 crossed\n\n"
                     "🔥 Momentum watch is ON.\n\n"
                     "Trade responsibly. DYOR."
-                )
+                ),
+                reply_markup=InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton(
+                            "🟢 LONG",
+                            url="https://www.tapbit.com/"
+                        ),
+                        InlineKeyboardButton(
+                            "🔴 SHORT",
+                            url="https://www.tapbit.com/"
+                        )
+                    ]
+                ])
             )
 
             sol_alert_state = True
 
-        elif sol_price < 110:
+        elif sol_price < 100:
             sol_alert_state = False
 
     except Exception as e:
@@ -1173,6 +1210,48 @@ async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         print(f"❌ Security reminder error: {e}")
+
+
+async def btc_zero_fee_promo(context: ContextTypes.DEFAULT_TYPE):
+    global btc_alert_chat_id
+
+    if btc_alert_chat_id is None:
+        print("⚠️ BTC promo group not detected yet.")
+        return
+
+    caption = (
+        "🚨 <b>BTC TRADING JUST GOT BETTER</b>\n\n"
+        "Trade BTC on Tapbit with <b>0 trading fees</b>.\n\n"
+        "⚡ More efficient trades.\n"
+        "💰 Keep more of your capital.\n"
+        "📈 Trade when the market moves.\n\n"
+        "👉 Check it out on Tapbit and trade smarter.\n\n"
+        "<i>Trade responsibly. DYOR.</i>"
+    )
+
+    try:
+        with open("btc_zero_fee.jpg", "rb") as photo:
+            await context.bot.send_photo(
+                chat_id=btc_alert_chat_id,
+                photo=photo,
+                caption=caption,
+                parse_mode="HTML",
+                reply_markup=InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton(
+                            "₿ TRADE BTC",
+                            url="https://www.tapbit.com/"
+                        )
+                    ]
+                ])
+            )
+
+        print("✅ BTC 0-fee promo sent successfully.")
+
+    except Exception as e:
+        print(f"❌ BTC 0-fee promo error: {e}")
+
+
 async def main():
     async with app:
         await app.initialize()
@@ -1197,6 +1276,11 @@ async def main():
             first=30
         )
 
+        app.job_queue.run_repeating(
+            btc_zero_fee_promo,
+            interval=14400,
+            first=60
+        )
         print("✅ BOT STARTED SUCCESSFULLY")
 
         while True:
