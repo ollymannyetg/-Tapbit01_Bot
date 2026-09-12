@@ -417,6 +417,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not text or text.startswith("/"):
         return
+
+    if text.strip().upper() == "USDT":
+        await usdt_apy_promo(context)
+        return
         
     # 📰 Any news
     if "any news" in text.lower():
@@ -1261,6 +1265,47 @@ async def btc_zero_fee_promo(context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         print(f"❌ BTC 0-fee promo error: {e}")
+
+
+async def usdt_apy_promo(context: ContextTypes.DEFAULT_TYPE):
+    global btc_alert_chat_id
+
+    if btc_alert_chat_id is None:
+        print("⚠️ USDT APY group not detected yet.")
+        return
+
+    caption = (
+        "💰 <b>YOUR USDT CAN DO MORE</b>\n\n"
+        "Don't let your USDT just sit idle.\n\n"
+        "🔥 Explore Tapbit's <b>APY opportunities</b> "
+        "and put your assets to work.\n\n"
+        "📈 Check the available APY options and choose what "
+        "fits your strategy.\n\n"
+        "👉 <b>Explore. Earn. Stay in control.</b>\n\n"
+        "<i>Always DYOR and understand the terms before participating.</i>"
+    )
+
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(
+                "💰 EARN",
+                url="https://www.tapbit.com/en/earn"
+            )
+        ]
+    ])
+
+    try:
+        await context.bot.send_message(
+            chat_id=btc_alert_chat_id,
+            text=caption,
+            parse_mode="HTML",
+            reply_markup=keyboard
+        )
+
+        print("✅ USDT APY promo sent successfully.")
+
+    except Exception as e:
+        print(f"❌ USDT APY promo error: {e}")
 
 
 async def main():
