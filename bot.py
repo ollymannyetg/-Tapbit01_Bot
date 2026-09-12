@@ -502,7 +502,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "CASHCAT": "cash-cat",
         "PONS": "pons",
         "USDG": "global-dollar",
-        "POL": "polygon-ecosystem-token"
+        "POL": "polygon-ecosystem-token",
+        "AXM": "axiom",
+        "DOT": "polkadot",
+        "XMR": "monero",
+        "LIT": "litentry",
+        "AAVE": "aave",
+        "SPX": "spx6900",
+        "XYO": "xyo-network",
+        "OKB": "okb",
+        "WLFI": "world-liberty-financial",
+        "BCH": "bitcoin-cash",
+        "SHIB": "shiba-inu"
     }
 
     stock_symbols = {
