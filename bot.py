@@ -517,7 +517,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "OKB": "okb",
         "WLFI": "world-liberty-financial",
         "BCH": "bitcoin-cash",
-        "SHIB": "shiba-inu"
+        "SHIB": "shiba-inu",
+        "GRAM": "gram"
     }
 
     stock_symbols = {
@@ -991,18 +992,20 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
             print("⚠️ BTC alert group not detected yet.")
             return
 
+        # First check: save the current price
         if btc_alert_state is None:
-            btc_alert_state = btc_price >= 77000
+            btc_alert_state = btc_price
             return
 
-        if btc_price >= 77000 and not btc_alert_state:
+        # 🔼 Upper alert: BTC crosses $87,000
+        if btc_alert_state < 87000 and btc_price >= 87000:
             await context.bot.send_message(
                 chat_id=btc_alert_chat_id,
                 text=(
                     "🚨 BTC PRICE ALERT\n\n"
-                    "₿ Bitcoin has crossed $77,000!\n\n"
+                    "₿ Bitcoin has crossed $87,000!\n\n"
                     f"💵 Current Price: ${btc_price:,.2f}\n"
-                    "📈 Level: $77K crossed\n\n"
+                    "📈 Level: $87K crossed\n\n"
                     "🔥 Momentum watch is ON.\n\n"
                     "Trade responsibly. DYOR."
                 ),
@@ -1020,10 +1023,34 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
                 ])
             )
 
-            btc_alert_state = True
+        # 🔽 Lower alert: BTC crosses below $86,000
+        elif btc_alert_state > 86000 and btc_price <= 86000:
+            await context.bot.send_message(
+                chat_id=btc_alert_chat_id,
+                text=(
+                    "🚨 BTC PRICE ALERT\n\n"
+                    "₿ Bitcoin has dropped below $86,000!\n\n"
+                    f"💵 Current Price: ${btc_price:,.2f}\n"
+                    "📉 Level: $86K crossed\n\n"
+                    "⚠️ Lower alert triggered.\n\n"
+                    "Trade responsibly. DYOR."
+                ),
+                reply_markup=InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton(
+                            "🟢 LONG",
+                            url="https://www.tapbit.com/"
+                        ),
+                        InlineKeyboardButton(
+                            "🔴 SHORT",
+                            url="https://www.tapbit.com/"
+                        )
+                    ]
+                ])
+            )
 
-        elif btc_price < 77000:
-            btc_alert_state = False
+        # Save the latest BTC price for the next check
+        btc_alert_state = btc_price
 
     except Exception as e:
         print(f"❌ BTC alert error: {e}")
@@ -1161,6 +1188,11 @@ async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
         "Avoid suspicious or fake links and always verify "
         "before logging in.\n\n"
 
+        "🔎 <b>Tapbit Verify</b>\n"
+        "• Not sure if a website, email, Telegram account, or X account "
+        "is official?\n"
+        "• Check it here: https://www.tapbit.com/en/verify\n\n"
+
         "💌 <b>Community Guidelines</b>\n"
         "• No offensive language, imagery, discrimination, "
         "scams, or unauthorized promotions.\n\n"
@@ -1168,6 +1200,7 @@ async def security_reminder(context: ContextTypes.DEFAULT_TYPE):
         "➡️ <b>Need Help?</b>\n"
         "Contact Tapbit through our official support channels "
         "and verify suspicious activity before taking action.\n\n"
+
         "🔗 <b>Official Support:</b> https://www.tapbit.com/en/support"
     )
 
