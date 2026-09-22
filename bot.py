@@ -518,7 +518,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "WLFI": "world-liberty-financial",
         "BCH": "bitcoin-cash",
         "SHIB": "shiba-inu",
-        "GRAM": "gram"
+        "ICP": "internet-computer",
+        "GRAM": "gram(prev. Toncoin)"
     }
 
     stock_symbols = {
