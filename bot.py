@@ -37,7 +37,9 @@ coin_aliases = {
     "APTOS": "APT",
     "ARBITRUM": "ARB",
     "OPTIMISM": "OP",
-    "POLYGON": "POL"
+    "POLYGON": "POL",
+    "GRAM": "GRAM",
+    "GRAM COIN": "GRAM"
 }
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -519,7 +521,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "BCH": "bitcoin-cash",
         "SHIB": "shiba-inu",
         "ICP": "internet-computer",
-        "GRAM": "gram(prev. Toncoin)"
+        "GRAM": "gram"
     }
 
     stock_symbols = {
