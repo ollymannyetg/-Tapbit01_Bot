@@ -606,11 +606,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "ids": coin_ids[coin],
                     "price_change_percentage": "24h"
                 },
+                headers={
+                    "User-Agent": "Mozilla/5.0"
+                },
                 timeout=10
             )
 
             response.raise_for_status()
-
+                
             data = response.json()
             market = data[0]
 
