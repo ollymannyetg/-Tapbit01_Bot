@@ -944,10 +944,12 @@ async def movers(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         message += "\n📊 Updated just now"
 
-        await update.message.reply_text(
-            message,
-            parse_mode="HTML"
-        )
+        with open("movers.jpg", "rb") as photo:
+            await update.message.reply_photo(
+                photo=photo,
+                caption=message,
+                parse_mode="HTML"
+            )
 
     except Exception as e:
         print(f"❌ Movers error: {e}")
