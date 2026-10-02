@@ -885,6 +885,75 @@ async def setuid(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
     await update.message.reply_text(f"✅ Exchange UID saved: {uid}")
+async def movers(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        response = requests.get(
+            "https://api.coingecko.com/api/v3/coins/markets",
+            headers={
+                "x-cg-demo-api-key": os.getenv("COINGECKO_API_KEY"),
+                "User-Agent": "Mozilla/5.0"
+            },
+            params={
+                "vs_currency": "usd",
+                "ids": ",".join(coin_ids.values()),
+                "order": "market_cap_desc",
+                "per_page": 100,
+                "page": 1,
+                "sparkline": "false",
+                "price_change_percentage": "24h"
+            },
+            timeout=10
+        )
+
+        response.raise_for_status()
+        data = response.json()
+
+        movers_data = [
+            coin for coin in data
+            if coin.get("price_change_percentage_24h") is not None
+        ]
+
+        gainers = sorted(
+            movers_data,
+            key=lambda x: x["price_change_percentage_24h"],
+            reverse=True
+        )[:3]
+
+        losers = sorted(
+            movers_data,
+            key=lambda x: x["price_change_percentage_24h"]
+        )[:3]
+
+        message = "🚀 <b>TOP MOVERS — 24H</b>\n\n"
+
+        message += "🟢 <b>TOP GAINERS</b>\n"
+
+        for coin in gainers:
+            message += (
+                f"🟢 {coin['symbol'].upper()} "
+                f"+{coin['price_change_percentage_24h']:.2f}%\n"
+            )
+
+        message += "\n🔴 <b>TOP LOSERS</b>\n"
+
+        for coin in losers:
+            message += (
+                f"🔴 {coin['symbol'].upper()} "
+                f"{coin['price_change_percentage_24h']:.2f}%\n"
+            )
+
+        message += "\n📊 Updated just now"
+
+        await update.message.reply_text(
+            message,
+            parse_mode="HTML"
+        )
+
+    except Exception as e:
+        print(f"❌ Movers error: {e}")
+        await update.message.reply_text(
+            "⚠️ Unable to fetch market movers right now. Please try again."
+        )
 async def settwitter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
 
@@ -968,6 +1037,7 @@ app.add_handler(CommandHandler("help", help_cmd))
 app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_members))
 app.add_handler(CommandHandler("setuid", setuid))
 app.add_handler(CommandHandler("settwitter", settwitter))
+app.add_handler(CommandHandler("movers", movers))
 app.add_handler(CommandHandler("removepoint", removepoint))
 
 import asyncio
