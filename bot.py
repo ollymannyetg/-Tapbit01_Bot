@@ -429,9 +429,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             response = requests.get(
                 "https://api.coingecko.com/api/v3/coins/markets",
+                headers={
+                    "x-cg-demo-api-key": os.getenv("COINGECKO_API_KEY"),
+                    "User-Agent": "Mozilla/5.0"
+                },
                 params={
                     "vs_currency": "usd",
-                    "ids": "bitcoin,ethereum,solana",
+                    "ids": coin_ids[coin],
                     "price_change_percentage": "24h"
                 },
                 timeout=10
@@ -1003,15 +1007,15 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
             btc_alert_state = btc_price
             return
 
-        # 🔼 Upper alert: BTC crosses $87,000
-        if btc_alert_state < 87000 and btc_price >= 87000:
+        # 🔼 Upper alert: BTC crosses $86,000
+        if btc_alert_state < 86000 and btc_price >= 86000:
             await context.bot.send_message(
                 chat_id=btc_alert_chat_id,
                 text=(
                     "🚨 BTC PRICE ALERT\n\n"
-                    "₿ Bitcoin has crossed $87,000!\n\n"
+                    "₿ Bitcoin has crossed $86,000!\n\n"
                     f"💵 Current Price: ${btc_price:,.2f}\n"
-                    "📈 Level: $87K crossed\n\n"
+                    "📈 Level: $86K crossed\n\n"
                     "🔥 Momentum watch is ON.\n\n"
                     "Trade responsibly. DYOR."
                 ),
@@ -1029,15 +1033,15 @@ async def btc_price_alert(context: ContextTypes.DEFAULT_TYPE):
                 ])
             )
 
-        # 🔽 Lower alert: BTC crosses below $86,000
-        elif btc_alert_state > 86000 and btc_price <= 86000:
+        # 🔽 Lower alert: BTC crosses below $85,000
+        elif btc_alert_state > 85000 and btc_price <= 85000:
             await context.bot.send_message(
                 chat_id=btc_alert_chat_id,
                 text=(
                     "🚨 BTC PRICE ALERT\n\n"
-                    "₿ Bitcoin has dropped below $86,000!\n\n"
+                    "₿ Bitcoin has dropped below $85,000!\n\n"
                     f"💵 Current Price: ${btc_price:,.2f}\n"
-                    "📉 Level: $86K crossed\n\n"
+                    "📉 Level: $85K crossed\n\n"
                     "⚠️ Lower alert triggered.\n\n"
                     "Trade responsibly. DYOR."
                 ),
@@ -1086,16 +1090,16 @@ async def eth_sol_price_alert(context: ContextTypes.DEFAULT_TYPE):
             print("⚠️ ETH/SOL alert group not detected yet.")
             return
 
-        # ETH $2,500 alert
+        # ETH $2,700 alert
         if eth_alert_state is None:
-            eth_alert_state = eth_price >= 2400
+            eth_alert_state = eth_price >= 2700
 
-        elif eth_price >= 2400 and not eth_alert_state:
+        elif eth_price >= 2700 and not eth_alert_state:
             await context.bot.send_message(
                 chat_id=btc_alert_chat_id,
                 text=(
                     "🚨 ETH PRICE ALERT\n\n"
-                    "Ξ Ethereum has crossed $2,400!\n\n"
+                    "Ξ Ethereum has crossed $2,700!\n\n"
                     f"💵 Current Price: ${eth_price:,.2f}\n"
                     "📈 Level: $2,400 crossed\n\n"
                     "🔥 Momentum watch is ON.\n\n"
@@ -1117,21 +1121,21 @@ async def eth_sol_price_alert(context: ContextTypes.DEFAULT_TYPE):
 
             eth_alert_state = True
 
-        elif eth_price < 2400:
+        elif eth_price < 2700:
             eth_alert_state = False
 
-        # SOL $110 alert
+        # SOL $120 alert
         if sol_alert_state is None:
-            sol_alert_state = sol_price >= 100
+            sol_alert_state = sol_price >= 120
 
-        elif sol_price >= 100 and not sol_alert_state:
+        elif sol_price >= 120 and not sol_alert_state:
             await context.bot.send_message(
                 chat_id=btc_alert_chat_id,
                 text=(
                     "🚨 SOL PRICE ALERT\n\n"
                     "◎ Solana has crossed $100!\n\n"
                     f"💵 Current Price: ${sol_price:,.2f}\n"
-                    "📈 Level: $100 crossed\n\n"
+                    "📈 Level: $120 crossed\n\n"
                     "🔥 Momentum watch is ON.\n\n"
                     "Trade responsibly. DYOR."
                 ),
@@ -1151,7 +1155,7 @@ async def eth_sol_price_alert(context: ContextTypes.DEFAULT_TYPE):
 
             sol_alert_state = True
 
-        elif sol_price < 100:
+        elif sol_price < 120:
             sol_alert_state = False
 
     except Exception as e:
