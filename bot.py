@@ -895,7 +895,7 @@ async def movers(update: Update, context: ContextTypes.DEFAULT_TYPE):
             },
             params={
                 "vs_currency": "usd",
-                "ids": ",".join(coin_ids.values()),
+                "ids": "bitcoin,ethereum,solana,sui,binancecoin,ripple,dogecoin,pepe,zcash,ethereum-classic,cardano,tron,avalanche-2,polkadot,chainlink,litecoin,bitcoin-cash,cosmos,uniswap,aave,near,aptos,arbitrum,optimism,polygon-ecosystem-token,monero,litentry,spx6900,xyo-network,okb,world-liberty-financial,shiba-inu,internet-computer,gram",
                 "order": "market_cap_desc",
                 "per_page": 100,
                 "page": 1,
