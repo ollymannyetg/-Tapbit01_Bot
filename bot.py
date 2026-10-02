@@ -1173,7 +1173,7 @@ async def eth_sol_price_alert(context: ContextTypes.DEFAULT_TYPE):
                     "🚨 ETH PRICE ALERT\n\n"
                     "Ξ Ethereum has crossed $2,700!\n\n"
                     f"💵 Current Price: ${eth_price:,.2f}\n"
-                    "📈 Level: $2,400 crossed\n\n"
+                    "📈 Level: $2,700 crossed\n\n"
                     "🔥 Momentum watch is ON.\n\n"
                     "Trade responsibly. DYOR."
                 ),
